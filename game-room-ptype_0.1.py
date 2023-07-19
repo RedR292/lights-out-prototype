@@ -1,40 +1,33 @@
 ##Test to make sure the pygame environment works for the visual ptype
-from Lightbulb import Lightbulb
+from LightbulbManager import LightbulbManager
 import pygame
 pygame.init()
 
-screen=pygame.display.set_mode((0,0),pygame.FULLSCREEN)
-tickGameClock=pygame.display.flip
-##game, scary, and subordinate surfaces
-gameSurf=pygame.Surface((902,1080))
-scarySurf=pygame.Surface((1018,1080))
-bulbSurf=pygame.Surface((902,561))
-deadSurf=pygame.Surface((902,518))
-gameSurf.fill('#FFFFFF')
-scarySurf.fill('#A020F0')
-bulbSurf.fill('#FDDC5C')
-deadSurf.fill('#FF0000')
+# TODO: REDESIGN TIMERS SUCH THAT THEY ARE NOT NONE WHEN INIT'D
 
-lightbulbs=[]
-for bulbRows in range(3):
-	bulbRow=[]
-	for lightbulb in range(3):
-		bulbRow.append(Lightbulb())
-	lightbulbs.append(bulbRow)
+##Build and colour the surfs
+def buildSurfs():
+	vars=globals() #global variable dict
+	names=['game','scary','bulb','dead']
+	sizes=[(902,1080),(1018,1080),(902,561),(902,518)]
+	colours=['#FFFFFF','#A020F0','#FDDC5C','#FF0000']
+	for surf in range(4):
+		name=f'{names[surf]}Surf'
+		vars[name]=pygame.Surface(sizes[surf])
+		vars[name].fill(colours[surf])
+	#ENDFOR
+#END buildSurfs -> surfs are now vars
 
-def displayBulbs(surface):
-	offsetX=220; offsetY=70
-	for bulbRows in lightbulbs:
-		for lightbulb in bulbRows:
-			surface.blit(lightbulb.surf,(offsetX,offsetY))
-			lightbulb.rect=pygame.Rect(offsetX,offsetY,70,70)
-			# print(lightbulb.rect)
-			offsetX+=170
-		#ENDFOR
-		offsetX=220; offsetY+=170
+##Display the bulbs from lbm onto surface
+def displayBulbs(surface,lbm):
+	for bulb_x in range(3):
+		for bulb_y in range(3):
+			displayData=lbm.getDisplay(bulb_x,bulb_y)
+			surface.blit(*displayData)
 	#ENDFOR
 #END displayBulbs
 
+##Display the surfs to the room
 def displaySurfaces():
 	screen.blit(gameSurf,(0,0))
 	screen.blit(scarySurf,(903,0))
@@ -42,19 +35,37 @@ def displaySurfaces():
 	gameSurf.blit(deadSurf,(0,562))
 #END displaySurfaces
 
-running=True
-while running:
+##Display the room to the screen
+def displayRoom():
 	screen.fill('#000000')
-	displaySurfaces()
-	displayBulbs(bulbSurf)
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			running = False
-		elif event.type==pygame.MOUSEBUTTONDOWN:
-			pos=pygame.mouse.get_pos()
-			for bulbRow in lightbulbs:
-				for lightbulb in bulbRow:
-					if lightbulb.rect.collidepoint(pos):
-						print("Clicked on a lb")
-						break
-	tickGameClock()
+	displaySurfaces() #This line comes first
+	displayBulbs(bulbSurf,lbm)
+#END displayRoom
+
+##Sets up the functional game constructs
+def setupGame():
+	vars=globals()
+	vars['screen']=pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+	vars['tick']=pygame.display.flip
+	vars['lbm']=LightbulbManager()
+	buildSurfs()
+#END setupGame
+
+##MAIN GAME LOOP
+def gameLoop():
+	running=True
+	while running:
+		displayRoom()
+		for event in pygame.event.get():
+			type=event.type
+			if type==pygame.QUIT:
+				running=False
+			elif type==pygame.MOUSEBUTTONDOWN:
+				pos=pygame.mouse.get_pos()
+				lbm.checkForClick(pos)
+			elif type==pygame.MOUSEBUTTONUP:
+				lbm.stopRescrewing()
+		tick()
+
+setupGame()
+gameLoop()
