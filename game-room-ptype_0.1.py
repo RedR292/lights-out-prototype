@@ -1,6 +1,7 @@
 ##Test to make sure the pygame environment works for the visual ptype
 from LightbulbManager import LightbulbManager
 import pygame
+from threading import Timer
 pygame.init()
 
 # TODO: REDESIGN TIMERS SUCH THAT THEY ARE NOT NONE WHEN INIT'D
@@ -51,9 +52,15 @@ def setupGame():
 	buildSurfs()
 #END setupGame
 
+def unscrew():
+	Timer(10,unscrew).start()
+	# print("tried to unscrew a bulb")
+	lbm.unscrew()
+
 ##MAIN GAME LOOP
 def gameLoop():
 	running=True
+	unscrew()
 	while running:
 		displayRoom()
 		for event in pygame.event.get():

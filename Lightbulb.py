@@ -48,7 +48,7 @@ class Lightbulb(pygame.sprite.Sprite):
 	#END breakBulb
 
 	def isUnscrewing(self):
-		return self.unscrewTimer.is_alive()
+		return self.unscrewTimer is not None and self.unscrewTimer.is_alive()
 	#END isUnscrewing
 
 	def isRescrewing(self):
@@ -61,6 +61,7 @@ class Lightbulb(pygame.sprite.Sprite):
 		self.unscrewTimeSeconds=10.0
 		self.manageTimers(True) #start unscrewTimer
 		self.state=1
+		self.surf.fill(('#FF0000'))
 	#END unscrew
 
 	##Rescrews a lightbulb

@@ -25,11 +25,15 @@ class LightbulbManager():
 	##Repeats randomisation if lb is already unscrewing
 	def unscrew(self):
 		noSelected=True
+		if rand(1,6) < 4:
+			print("No lightbulb unscrewing")
+			return
+		print('Lightbulb unscrewing')
 		while noSelected:
 			random_i=rand(0,2); random_j=rand(0,2)
-			lb=lbs[random_i][random_j]
+			lb=self.lightbulbs[random_i][random_j]
 			if not lb.isUnscrewing():
-				noSelected=True
+				noSelected=False
 		#ENDWHILE -> lb is chosen
 		lb.unscrew()
 	#END unscrew
@@ -40,6 +44,8 @@ class LightbulbManager():
 	#END rescrew
 
 	def stopRescrewing(self):
+		if self.focusedBulb is None:
+			return #NO LB clicked
 		self.focusedBulb.stopRescrewing()
 		self.focusedBulb=None
 
@@ -52,8 +58,9 @@ class LightbulbManager():
 			for col in range(3):
 				lb=self.lightbulbs[row][col]
 				if lb.isClicked(coords):
-					print("Lightbulb was clicked!")
+					# print("Lightbulb was clicked!")
 					self.focusedBulb=lb
+
 
 #ENDCLASS
 
